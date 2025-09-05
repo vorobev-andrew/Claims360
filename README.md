@@ -64,9 +64,11 @@ The pipeline follows a **Bronze → Silver → Gold** medallion architecture:
   - Apply DLT expectations for quality enforcement (valid IDs, date ranges, required fields).  
 
 - **Gold**  
-  - Curated, query-optimized tables for:  
+  - Curated, query-optimized tables to report on past denials:  
     - Denials by root cause and payer  
-    - Time-to-payment trends  
+    - Time-to-payment trends
+    - Likelihood of payment calculated with mlflow
+  - And future trends:
     - Cash flow forecasting  
     - MLflow model predictions of denial probability  
 
