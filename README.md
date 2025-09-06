@@ -1,29 +1,29 @@
 # Claims360: Unified Claims Management with Databricks Lakehouse  
 
 ### Theme  
-Leveraging the Databricks Lakehouse platform to integrate siloed healthcare reimbursement data into a governed **medallion architecture pipeline**, providing real-time visibility and predictive insights that extend beyond Epic’s native capabilities.  
+Leveraging the Databricks Lakehouse platform to integrate siloed healthcare reimbursement data into a governed **medallion architecture pipeline**, providing real-time visibility and predictive insights that extend beyond individual data sources' native capabilities.  
 
 ---
 
 ## Business Need  
-Healthcare billing teams face persistent challenges with **delays and denials** due to data siloes across EHR exports, clearinghouse responses, and payer remittance files. Even as EHRs like Epic improve their reporting and denial dashboards, key gaps remain:  
+Healthcare billing teams face persistent challenges with **delays and denials** due to data siloes across EHR exports, clearinghouse responses, and payer remittance files. Even as EHRs improve their payer integrations and reporting and denial dashboards, key gaps remain:  
 
-- **Limited scope**: Dashboards reflect only what Epic ingests, not the entire claims ecosystem.  
-- **Latency**: Reports often refresh overnight, preventing real-time visibility.  
+- **Limited scope**: Dashboards reflect only what the EHR ingests, not the entire claims ecosystem.  
+- **Latency**: Reports refresh on a nightly basis, without support for data streaming and real-time visibility.  
 - **Siloed operations**: Clearinghouse feeds, payer portals, and call center data remain disconnected.  
-- **Rigid modeling**: Difficult to extend Epic’s data model for novel KPIs or predictive use cases.  
+- **Rigid modeling**: Difficult to extend the EHR’s data model for novel KPIs or predictive use cases.  
 - **Governance limitations**: Controls are clinical/operational but not built for analytics across teams or organizations.  
 
 As a result, finance and operations teams lack the **timely, multi-source insights** needed to reduce denials, accelerate appeals, and improve margins.  
 
 ---
 
-## Project Goals: Differentiated Value Beyond Epic  
+## Project Goals: Differentiated Value Beyond the EHR  
 
-This project demonstrates how Databricks can extend beyond Epic’s reporting by delivering a Lakehouse-based claims pipeline that is:  
+This project demonstrates how Databricks can extend impact beyond individual data sources by delivering a Lakehouse-based claims pipeline that is:  
 
 1. **Integrated**  
-   - Unify Epic denial/correspondence records with raw clearinghouse 277CA (acknowledgments) and 835 (remittance advice) feeds.  
+   - Unify EHR denial/correspondence records with raw clearinghouse 277CA (acknowledgments) and 835 (remittance advice) feeds.  
    - Reconcile mismatches faster than built-in EHR logic.  
 
 2. **Predictive**  
@@ -32,7 +32,7 @@ This project demonstrates how Databricks can extend beyond Epic’s reporting by
 
 3. **Benchmark-Driven**  
    - Create Gold tables comparing denial metrics across payers and specialties.  
-   - Simulate cross-org benchmarking outside Epic’s Financial Pulse.  
+   - Simulate cross-org benchmarking outside EHR reports.  
 
 4. **Operationally Aware**  
    - Correlate claim timelines with non-EHR datasets (staffing schedules, call center response times).  
@@ -56,7 +56,7 @@ The pipeline follows a **Bronze → Silver → Gold** medallion architecture:
   - Ingest diverse sources:  
     - Clearinghouse CSVs (277CA)  
     - Payer JSON responses (835)  
-    - HL7/FHIR exports from Epic  
+    - Data exports from the EHR  
   - Streaming ingestion with Auto Loader.  
 
 - **Silver**  
@@ -84,7 +84,7 @@ The pipeline follows a **Bronze → Silver → Gold** medallion architecture:
 flowchart TD
   %% Sources
   subgraph External_Sources["External & Operational Sources"]
-    A1["Epic exports (HL7/FHIR)"]
+    A1["EHR exports"]
     A2["Clearinghouse 277CA (CSV)"]
     A3["Payer 835 (JSON)"]
     A4["Ops data: staffing, call center, workqueues"]
