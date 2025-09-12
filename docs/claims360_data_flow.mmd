@@ -1,0 +1,16 @@
+flowchart LR
+    ehr[EHR Batch Exports] --> bronze[Bronze Layer: Raw Ingestion]
+    277[277CA Acknowledgments] --> bronze
+    835[835 Remittances] --> bronze
+    bronze --> silver_epic[Silver: Epic Claims Enriched]
+    bronze --> silver_277[Silver: 277CA Normalized]
+    bronze --> silver_835[Silver: 835 Remit Lines]
+
+    silver_epic --> silver_recon[Silver: Reconciliation Layer]
+    silver_277 --> silver_recon
+    silver_835 --> silver_recon
+
+    silver_recon --> gold[Gold Layer: KPIs, Forecasts, ML]
+
+    gold --> M[ML Features & Models]
+    gold --> D[Dashboards & Alerts]

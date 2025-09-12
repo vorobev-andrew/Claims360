@@ -28,13 +28,12 @@ Failures are quarantined, not dropped.
 
 ---
 
-## HL7/FHIR Expectations
+## EHR Expectations
 
 - **Critical**
-  - `patient_id`, `encounter_id` must not be null
+  - `patient_id`, `claim_id`, `billed_amt` must not be null
 - **Warning**
-  - `proc_code` must exist in CPT code set
-  - `diagnosis` must exist in ICD-10 list
+  - `cpt` must exist in CPT code set
 
 ---
 
