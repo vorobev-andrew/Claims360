@@ -1,0 +1,21 @@
+{
+  "type":"struct",
+  "fields": [
+  {"name":"interchange_control_number", "type":"string","nullable":true,"metadata":{}},
+  {"name":"functional_group_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"transaction_set_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"ack_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"claim_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"patient_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_name", "type":"string","nullable":true,"metadata":{}},
+  {"name":"status_code", "type":"string","nullable":true,"metadata":{}},
+  {"name":"status_description", "type":"string","nullable":true,"metadata":{}},
+  {"name":"event_time", "type":"string","nullable":true,"metadata":{}},
+  {"name":"submitter_npi", "type":"string","nullable":true,"metadata":{}},
+  {"name":"provider_tin", "type":"string","nullable":true,"metadata":{}},
+  {"name":"trace_number", "type":"string","nullable":true,"metadata":{}},
+  {"name":"file_source", "type":"string","nullable":true,"metadata":{}},
+  {"name":"ingest_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_id", "type":"string","nullable":true,"metadata":{}}
+  ]
+}

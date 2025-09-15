@@ -1,0 +1,20 @@
+{
+  "type":"struct",
+  "fields": [
+  {"name":"remit_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"transaction_set_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"claim_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"patient_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_name", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payment_amount", "type":"string","nullable":true,"metadata":{}},
+  {"name":"adjustment_reason_code", "type":"string","nullable":true,"metadata":{}},
+  {"name":"adjustment_amount", "type":"string","nullable":true,"metadata":{}},
+  {"name":"service_date", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payment_date", "type":"string","nullable":true,"metadata":{}},
+  {"name":"check_or_eft_trace", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_control_number", "type":"string","nullable":true,"metadata":{}},
+  {"name":"file_source", "type":"string","nullable":true,"metadata":{}},
+  {"name":"ingest_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_id", "type":"string","nullable":true,"metadata":{}}
+  ]
+}
