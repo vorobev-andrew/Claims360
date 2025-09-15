@@ -1,7 +1,7 @@
 # Claims360 Data Dictionary
 
 This document defines the data contracts for synthetic datasets used in the Claims360 project.  
-Schemas are modeled on real-world healthcare EDI and EHR exports, simplified for clarity.
+Schemas are modeled on real-world healthcare reimbursement data, simplified for clarity.
 
 ---
 
@@ -16,7 +16,7 @@ By reconciling these perspectives, the Lakehouse surfaces mismatches, identifies
 
 ---
 
-## Epic/EHR Batch Claim Exports
+## EHR Batch Claim Exports
 #### Exported from the hospital/provider’s EHR.  
 *Meaning*: Provides the provider’s internal view of a claim’s lifecycle.
 
