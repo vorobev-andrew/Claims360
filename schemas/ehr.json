@@ -4,12 +4,12 @@
   {"name":"claim_id", "type":"string","nullable":true,"metadata":{}},
   {"name":"patient_id", "type":"string","nullable":true,"metadata":{}},
   {"name":"encounter_id", "type":"string","nullable":true,"metadata":{}},
+  {"name":"payer_id", "type":"string","nullable":true,"metadata":{}},
   {"name":"cpt", "type":"string","nullable":true,"metadata":{}},
   {"name":"billed_amt", "type":"string","nullable":true,"metadata":{}},
   {"name":"expected_amt", "type":"string","nullable":true,"metadata":{}},
   {"name":"workqueue_status", "type":"string","nullable":true,"metadata":{}},
   {"name":"as_of_date", "type":"string","nullable":true,"metadata":{}},
-  {"name":"source_file_id", "type":"string","nullable":true,"metadata":{}},
-  {"name":"payer_id", "type":"string","nullable":true,"metadata":{}}
+  {"name":"source_file_id", "type":"string","nullable":true,"metadata":{}}
   ]
 }
