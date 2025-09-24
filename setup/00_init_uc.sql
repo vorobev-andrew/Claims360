@@ -1,7 +1,6 @@
 -- Create catalog
 CREATE CATALOG IF NOT EXISTS claims360_dev
 COMMENT 'Development catalog for Claims360 project';
-USE CATALOG claims360_dev;
 
 -- Schemas
 CREATE SCHEMA IF NOT EXISTS claims360_dev.bronze COMMENT 'Raw/landing + minimally parsed';
