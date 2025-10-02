@@ -1,42 +1,30 @@
--- Assumed workspace groups (you can create/assign in the admin console):
---   claims360_engineers
---   claims360_analysts
---   claims360_jobs
+-- Create and use claims360_dev catalog
+CREATE CATALOG IF NOT EXISTS claims360_dev;
+USE CATALOG claims360_dev;
 
--------------------------
--- CATALOG-LEVEL GRANTS
--------------------------
-GRANT USAGE ON CATALOG claims360_dev TO claims360_engineers;
-GRANT USAGE ON CATALOG claims360_dev TO claims360_analysts;
-GRANT USAGE ON CATALOG claims360_dev TO claims360_jobs;
+-- Schemas
+CREATE SCHEMA IF NOT EXISTS bronze;
+CREATE SCHEMA IF NOT EXISTS silver;
+CREATE SCHEMA IF NOT EXISTS gold;
 
-------------------------
--- SCHEMA-LEVEL GRANTS
-------------------------
--- Bronze: lock down to jobs + engineers (analysts should not see PHI/raw)
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW, CREATE FUNCTION ON SCHEMA claims360_dev.bronze TO `claims360_engineers`;
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW, CREATE FUNCTION ON SCHEMA claims360_dev.bronze TO `claims360_jobs`;
+-- Engineers: manage bronze & silver, read gold
+GRANT USAGE ON CATALOG claims360_dev TO r_engineer;
 
--- Silver: lock down to jobs + engineers (analysts should not see PHI)
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW, CREATE FUNCTION ON SCHEMA claims360_dev.silver TO `claims360_engineers`;
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW, CREATE FUNCTION ON SCHEMA claims360_dev.silver TO `claims360_jobs`;
+-- Management rights on bronze & silver
+GRANT USAGE ON SCHEMA bronze TO r_engineer;
+GRANT SELECT, MODIFY, CREATE TABLE ON SCHEMA bronze TO r_engineer;
 
--- Gold: broad read for analysts; jobs write; engineers build/debug
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW ON SCHEMA claims360_dev.gold TO `claims360_engineers`;
-GRANT USAGE, SELECT, MODIFY, CREATE TABLE, CREATE VIEW ON SCHEMA claims360_dev.gold TO `claims360_jobs`;
-GRANT USAGE, SELECT ON SCHEMA claims360_dev.gold TO `claims360_analysts`;
+GRANT USAGE ON SCHEMA silver TO r_engineer;
+GRANT SELECT, MODIFY, CREATE TABLE ON SCHEMA silver TO r_engineer;
 
--------------------------
--- VOLUME-LEVEL GRANTS
--------------------------
--- Volumes control file access for landing/exports/checkpoints.
-GRANT READ VOLUME  ON VOLUME claims360_dev.bronze.raw     TO `claims360_engineers`;
-GRANT READ VOLUME  ON VOLUME claims360_dev.bronze.raw     TO `claims360_jobs`;
-GRANT WRITE VOLUME ON VOLUME claims360_dev.bronze.raw     TO `claims360_jobs`; 
-GRANT READ VOLUME  ON VOLUME claims360_dev.silver.curated TO `claims360_engineers`;
-GRANT READ VOLUME  ON VOLUME claims360_dev.silver.curated TO `claims360_jobs`;
-GRANT WRITE VOLUME ON VOLUME claims360_dev.silver.curated TO `claims360_jobs`;
-GRANT READ VOLUME  ON VOLUME claims360_dev.gold.publish   TO `claims360_engineers`;
-GRANT READ VOLUME  ON VOLUME claims360_dev.gold.publish   TO `claims360_jobs`;
-GRANT READ VOLUME  ON VOLUME claims360_dev.gold.publish   TO `claims360_analysts`;
-GRANT WRITE VOLUME ON VOLUME claims360_dev.gold.publish   TO `claims360_jobs`;
+-- Read-only on gold
+GRANT USAGE ON SCHEMA gold TO r_engineer;
+GRANT SELECT ON SCHEMA gold TO r_engineer;
+
+
+-- Analysts: read silver & gold
+GRANT USAGE ON SCHEMA silver TO r_analyst;
+GRANT SELECT ON SCHEMA silver TO r_analyst;
+
+GRANT USAGE ON SCHEMA gold   TO r_analyst;
+GRANT SELECT ON SCHEMA gold   TO r_analyst;

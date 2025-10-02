@@ -1,16 +1,65 @@
 flowchart LR
-    ehr[EHR Exports – Batch] --> bronze[Bronze Layer: Raw Ingestion]
-    277[277CA Acknowledgments – Stream] --> bronze
-    835[835 Remittances – Batch] --> bronze
-    bronze --> silver_ehr[Silver: EHR Claims Enriched]
-    bronze --> silver_277[Silver: 277CA Normalized]
-    bronze --> silver_835[Silver: 835 Remit Lines]
-
-    silver_ehr --> silver_recon[Silver: Reconciliation Layer]
-    silver_277 --> silver_recon
-    silver_835 --> silver_recon
-
-    silver_recon --> gold[Gold Layer: KPIs, Forecasts, ML]
-
-    gold --> M[ML Features & Models]
-    gold --> D[Dashboards & Alerts]
+    %% Bronze Layer - Streaming tables
+    B1[ack_277ca_raw<br/>Streaming table]
+    B2[ehr_claims_raw<br/>Streaming table]
+    B3[payments_835_raw<br/>Streaming table]
+    
+    %% Silver Layer - Staging tables
+    S1[stg_ack_277ca_events<br/>Streaming table]
+    S2[stg_claim_headers<br/>Streaming table]
+    S3[stg_payments_835_events<br/>Streaming table]
+    
+    %% Silver Layer - Completed tables
+    S4[ack_277ca_rejects]
+    S5[ack_277ca_events<br/>Streaming table]
+    S6[claim_headers_rejects]
+    S7[claim_headers<br/>Streaming table]
+    S8[payments_835_rejects]
+    S9[payments_835_events<br/>Streaming table]
+    
+    %% Silver Layer - Materialized view
+    S10[(curated_claims<br/>Materialized view)]
+    
+    %% Gold Layer
+    G1[(fact_claim<br/>Materialized view)]
+    G2{{denial_events_enriched<br/>View}}
+    G3[fact_denial_event<br/>Streaming table]
+    
+    %% Connections - Bronze to Silver Staging
+    B1 --> S1
+    B2 --> S2
+    B3 --> S3
+    
+    %% Connections - Silver Staging to Tables
+    S1 --> S4
+    S1 --> S5
+    S2 --> S6
+    S2 --> S7
+    S3 --> S8
+    S3 --> S9
+    
+    %% Connections - Silver to Curated
+    S7 --> S10
+    S5 --> S10
+    S9 --> S10
+    
+    %% Connections - Gold Layer
+    S10 --> G1
+    G1 --> G2
+    S9 --> G2
+    G2 --> G3
+    
+    %% Styling - Using actual bronze, silver, gold colors
+    classDef bronze fill:#CD7F32,stroke:#8B4513,color:#000,stroke-width:3px
+    classDef silver fill:#C0C0C0,stroke:#808080,color:#000,stroke-width:3px
+    classDef gold fill:#FFD700,stroke:#DAA520,color:#000,stroke-width:3px
+    classDef silverMV fill:#E8E8E8,stroke:#808080,color:#000,stroke-width:4px
+    classDef goldMV fill:#FFF4CC,stroke:#DAA520,color:#000,stroke-width:4px
+    classDef view fill:#666,stroke:#999,color:#fff,stroke-dasharray: 5 3
+    
+    class B1,B2,B3 bronze
+    class S1,S2,S3,S4,S5,S6,S7,S8,S9 silver
+    class S10 silverMV
+    class G1 goldMV
+    class G2 view
+    class G3 goldMV

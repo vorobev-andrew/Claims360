@@ -1,84 +1,62 @@
-# Claims360: Healthcare Reimbursement Analytics on the Lakehouse 
+# Claims360 – Real-time Billing & Denials Analytics
 
-## Overview  
-Hospitals face major financial risk from claim denials and delayed reimbursements.  
-Core claim lifecycle data is spread across siloed systems, each providing only part of the story:
-
-- **277CA acknowledgments (clearinghouse → hospital)**: confirms whether a claim was received or rejected at the gateway.  
-- **835 remittance advices (payer → hospital)**: shows adjudication results, payments, and denial codes.  
-- **Batch EHR exports (hospital internal)**: captures the provider’s internal claim lifecycle, expected amounts, and workqueue status.  
-
-**Why all three matter**:  
-- Clearinghouse/payer files give the *external reality* of how payers respond.  
-- EHR exports capture the *internal truth* of what the provider submitted and how staff worked the claim.  
-- Only by reconciling both perspectives can you uncover mismatches, measure lag, and predict preventable denials.  
-
-The Claims360 Lakehouse unifies these feeds into an end-to-end analytics and ML pipeline.  
-This enables **denial prevention, payer benchmarking, and cash flow forecasting**, improving hospitals’ net reimbursement.
+> **Business purpose:** In revenue cycle, one of the hardest challenges is reconciling multiple sources of truth — EHR submissions, payer acknowledgements, and remittance denials — across systems that don’t naturally talk to each other. This project shows how a **Lakehouse pipeline** unifies those data streams into a single view of claim health, enabling operations and analytics teams to cut through silos and directly measure payer performance.
 
 ---
 
-## Architecture (Medallion)  
-- **Bronze** → Raw ingestion with schema enforcement + checkpoints.  
-- **Silver** → Standardized, deduplicated, reconciled across sources (expectations applied).  
-- **Gold** → De-identified KPIs, payer benchmarks, cashflow forecasts, and ML scores.  
-- **ML** → Denial-risk model scored back into Gold.  
-- **Governance** → Unity Catalog RBAC, PHI masking, lineage.  
+## Why this matters
+
+In my role as a **Technical Solutions Engineer at a major EHR company (revenue cycle apps)**, I’ve seen how health systems struggle with fragmented data:
+- Claim submissions live in the EHR,
+- Payer acknowledgements come back from clearinghouses,
+- Payment and denial details arrive separately in 835s.
+
+Analysts want **first-pass yield, denial rates, days to first payment, and $ at risk**, but they waste hours reconciling exports instead of answering business questions.  
+
+The **business need** is clear:  
+➡️ **Store all relevant claim lifecycle data in one unified platform**.  
+➡️ **Support both batch (EHR drops) and streaming (payer feeds)**.  
+➡️ **Empower engineers, analysts, and ops** to collaborate on the *same platform* with governed access.  
+
+This is exactly where the **Lakehouse** comes in.
 
 ---
 
-## Repo Structure
+## The Lakehouse Solution
 
-| Folder / File           | Description                                                                                 |
-|--------------------------|---------------------------------------------------------------------------------------------|
-| `data/`                 | Synthetic datasets (277CA, 835, EHR batch exports, staffing)                                |
-| `notebooks/`            | PySpark notebooks: Bronze ingestion, Silver transforms, Gold aggregates, ML training        |
-| `pipelines/`            | Delta Live Tables / Lakeflow SQL pipeline definitions                                       |
-| `ml/`                   | Feature engineering queries, training scripts, batch scoring UDF, and model card            |
-| `dashboards/`           | DBSQL dashboard queries and alert logic                                                     |
-| `setup/`                | Unity Catalog setup scripts, governance grants, sample data seeding, and cluster configs    |
-| `schemas/`              | Schema contracts (e.g., 277CA.json, 835.json, ehr.json)                                     |
-| `tests/`                | Unit tests (pytest) and fixtures for validating transforms and expectations                 |
-| `configs/`              | Environment-specific configs (dev, qa, prod) for pipelines and jobs                         |
-| `docs/`                 | Documentation (data dictionary, expectations, lineage, diagrams, architecture)              |
-| `.github/workflows/`    | CI/CD workflows (Python linting, SQL validation, unit tests)                                |
+This project builds a **Delta Live Tables (DLT) pipeline** that mirrors the realities of healthcare billing:
 
----
+- **Bronze**: Raw streaming ingestion of claims, 277CA, and 835 files via Auto Loader.  
+- **Silver**: Cleaned and curated tables with bad-row quarantine (so ops can inspect rejects instead of silently losing them).  
+- **Curated silver claim (materialized view)**: One row per claim with payer mappings, balances, and flags — the “single source of truth” analysts and leadership need.  
+- **Gold facts**:
+  - `fact_claim`: Full view of claim balances and statuses, refreshed in sync with silver.  
+  - `fact_denial_event`: Streaming, upserted denials with stable event keys (so we don’t double-count adjustments).  
 
-## Project Phases (MVP)  
-1. **Foundations** – Unity Catalog, env setup, PHI policy.  
-2. **Synthetic Data** – Generate EHR, 277CA & 835 JSON/CSV with realistic noise.  
-3. **Bronze** – Auto Loader ingestion, schema enforcement, rescue rows.  
-4. **Silver** – Deduplication, normalization, reconciliation, expectations + quarantine.  
-5. **Gold** – Incremental KPIs (denial rates, time-to-payment).  
-6. **ML** – One denial-risk classification model, batch scored into Gold.  
-7. **Dashboards** – DBSQL dashboard + basic alerts.  
+### Key design choices
+
+- **Materialized view in silver**: Ensures cross-stream joins (EHR + 277 + 835) stay performant and reliable for downstream analytics.  
+- **Streaming with `APPLY CHANGES` in gold**: Captures denial events exactly once and continuously updates fact tables without batch rebuilds.  
+- **Reject tables kept**: Transparency — analysts and engineers can inspect “bad rows” (missing claim IDs, bad amounts) instead of discarding them.  
 
 ---
 
-## Tech Stack
-- Databricks Lakehouse (Lakeflow, Unity Catalog, DBSQL)  
-- Delta Lake (Auto Loader, CDF, OPTIMIZE, liquid clustering)  
-- MLflow (model registry, batch scoring)  
-- GitHub Actions (CI: linting, tests, SQL checks)  
+## What leaders & analysts get
+
+- **KPIs**: Total claims, first-pass yield %, denial rate %, adjustment $ impact.  
+- **Trends**: FPY% and denial% per payer over time.  
+- **Breakdowns**: Billed vs paid vs balance, avg days to first payment, top denial categories.  
+- **Governed access**: Engineers prep bronze/silver; analysts self-serve in gold.  
 
 ---
 
-## Business Impact  
+## Why it’s different from EHR dashboards
 
-By unifying **clearinghouse acknowledgments (277CA), payer remittances (835), and provider EHR exports**, hospitals can:  
-1. Detect claim rejections earlier  
-2. Monitor payer denial patterns  
-3. Forecast reimbursement risk  
-4. Benchmark operational performance  
-5. Reconcile internal expectations with external adjudication for true financial visibility  
+EHR dashboards refresh overnight and silo claims vs denials. With the Lakehouse:  
+- We see payer trends **in near-real-time**.  
+- We unify claims + acks + denials in a **single SQL model**.  
+- We add governance + role-based access, while still letting analysts create their own dashboards on gold data.  
 
 ---
 
-## Data Flow
-
-The diagram below shows how EHR batch exports, 277CA acknowledgments, and 835 remittances flow through the Lakehouse (Bronze → Silver → Gold).  
-
-
-![Claims360 Data Flow](./claims360_data_flow.png)  
-<sub>Diagram source: [claims360_data_flow.mmd](./claims360_data_flow.mmd)</sub>
+This pipeline shows how **the Lakehouse solves a real business problem in healthcare revenue cycle**: faster cash, fewer denials, and unified collaboration across technical and business teams.
