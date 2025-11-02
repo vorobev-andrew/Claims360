@@ -74,9 +74,9 @@ SELECT
   COALESCE(s.status_code_raw,        d_by_desc.status_code,       'N/A') AS status_code,
   s._ingest_ts, s._source_system
 FROM src s
-LEFT JOIN silver.dim_ack_status d_by_code
+LEFT JOIN /*+ BROADCAST(d_by_code) */ silver.dim_ack_status d_by_code
   ON s.status_code_raw = d_by_code.status_code
-LEFT JOIN silver.dim_ack_status d_by_desc
+LEFT JOIN /*+ BROADCAST(d_by_desc) */ silver.dim_ack_status d_by_desc
   ON UPPER(s.status_description_raw) = UPPER(d_by_desc.status_description)
 WHERE s.ack_id   IS NOT NULL
   AND s.claim_id IS NOT NULL
@@ -133,7 +133,7 @@ SELECT
   CASE WHEN f.reason_code IS NULL THEN 0     ELSE COALESCE(CAST(m.is_denial AS INT), 0) END AS is_denial,
   m.code_type AS code_type
 FROM src f
-LEFT JOIN silver.dim_denial_reason_map m
+LEFT JOIN /*+ BROADCAST(m) */ silver.dim_denial_reason_map m
   ON m.code_type = 'CARC'
  AND m.code      = f.reason_code
 WHERE remit_id IS NOT NULL
