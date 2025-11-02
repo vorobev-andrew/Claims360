@@ -39,7 +39,7 @@ ack AS (
   FROM silver.ack_277ca_events
   GROUP BY claim_id
 )
-SELECT
+SELECT /*+ BROADCAST(dp) */
   h.claim_id,
   h.payer_id,
   dp.payer_name,
@@ -60,5 +60,5 @@ SELECT
 FROM hdr h
 LEFT JOIN pmt p USING (claim_id)
 LEFT JOIN ack a USING (claim_id)
-LEFT JOIN /*+ BROADCAST(dp) */ silver.dim_payer dp 
+LEFT JOIN silver.dim_payer dp 
   ON dp.payer_id = h.payer_id;
