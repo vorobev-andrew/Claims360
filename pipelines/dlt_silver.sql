@@ -68,15 +68,15 @@ WITH src AS (
     '277CA'                           AS _source_system
   FROM STREAM(bronze.ack_277ca_raw)
 )
-SELECT
+SELECT /*+ BROADCAST(d_by_code), BROADCAST(d_by_desc) */
   s.ack_id, s.claim_id, s.payer_id, s.patient_id, s.event_ts,
   COALESCE(s.status_description_raw, d_by_code.status_description, 'N/A') AS status_description,
   COALESCE(s.status_code_raw,        d_by_desc.status_code,       'N/A') AS status_code,
   s._ingest_ts, s._source_system
 FROM src s
-LEFT JOIN /*+ BROADCAST(d_by_code) */ silver.dim_ack_status d_by_code
+LEFT JOIN silver.dim_ack_status d_by_code
   ON s.status_code_raw = d_by_code.status_code
-LEFT JOIN /*+ BROADCAST(d_by_desc) */ silver.dim_ack_status d_by_desc
+LEFT JOIN silver.dim_ack_status d_by_desc
   ON UPPER(s.status_description_raw) = UPPER(d_by_desc.status_description)
 WHERE s.ack_id   IS NOT NULL
   AND s.claim_id IS NOT NULL
@@ -127,13 +127,13 @@ WITH src AS (
     '835'                                        AS _source_system
   FROM STREAM(bronze.payments_835_raw)
 )
-SELECT
+SELECT /*+ BROADCAST(m) */
   f.*,
   CASE WHEN f.reason_code IS NULL THEN 'N/A' ELSE m.reason_category END       AS reason_category,
   CASE WHEN f.reason_code IS NULL THEN 0     ELSE COALESCE(CAST(m.is_denial AS INT), 0) END AS is_denial,
   m.code_type AS code_type
 FROM src f
-LEFT JOIN /*+ BROADCAST(m) */ silver.dim_denial_reason_map m
+LEFT JOIN silver.dim_denial_reason_map m
   ON m.code_type = 'CARC'
  AND m.code      = f.reason_code
 WHERE remit_id IS NOT NULL
