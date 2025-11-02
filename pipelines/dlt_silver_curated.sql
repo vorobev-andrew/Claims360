@@ -60,4 +60,5 @@ SELECT
 FROM hdr h
 LEFT JOIN pmt p USING (claim_id)
 LEFT JOIN ack a USING (claim_id)
-LEFT JOIN silver.dim_payer dp ON dp.payer_id = h.payer_id;
+LEFT JOIN /*+ BROADCAST(dp) */ silver.dim_payer dp 
+  ON dp.payer_id = h.payer_id;
